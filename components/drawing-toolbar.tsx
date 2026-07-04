@@ -1,7 +1,29 @@
 'use client'
 
 import { Pen, Eraser, Highlighter, Paintbrush, Square, Circle, Minus, Type, Undo2, Trash2, Wand2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+
+interface ToolButtonProps {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  active: boolean
+  onClick: () => void
+}
+
+function ToolButton({ icon: Icon, label, active, onClick }: ToolButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className={`p-2 rounded-lg transition-all ${
+        active
+          ? 'bg-accent text-accent-foreground shadow-lg'
+          : 'text-foreground hover:bg-white/10'
+      }`}
+    >
+      <Icon className="w-5 h-5" />
+    </button>
+  )
+}
 
 interface DrawingToolbarProps {
   tool: string
@@ -35,9 +57,9 @@ export default function DrawingToolbar({
   onShowTextExtractor,
 }: DrawingToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 max-w-full overflow-x-auto">
-      {/* Tool Selection */}
-      <div className="flex gap-1 flex-wrap overflow-x-auto pb-2">
+    <div className="flex flex-col gap-3">
+      {/* Main Tool Icons - Floating Pill */}
+      <div className="flex gap-2 items-center bg-background/40 backdrop-blur-lg rounded-full px-3 py-2 border border-white/10 w-fit">
         <ToolButton
           icon={Pen}
           label="Pen"
@@ -52,7 +74,7 @@ export default function DrawingToolbar({
         />
         <ToolButton
           icon={Highlighter}
-          label="Highlight"
+          label="Highlighter"
           active={tool === 'highlighter'}
           onClick={() => onToolChange('highlighter')}
         />
@@ -62,121 +84,116 @@ export default function DrawingToolbar({
           active={tool === 'marker'}
           onClick={() => onToolChange('marker')}
         />
+        
+        <div className="w-px h-5 bg-white/10"></div>
+        
         <ToolButton
           icon={Square}
           label="Rectangle"
-          onClick={() => onAddShape('rectangle')}
+          active={tool === 'rectangle'}
+          onClick={() => {
+            onToolChange('rectangle')
+            onAddShape('rectangle')
+          }}
         />
         <ToolButton
           icon={Circle}
           label="Circle"
-          onClick={() => onAddShape('circle')}
+          active={tool === 'circle'}
+          onClick={() => {
+            onToolChange('circle')
+            onAddShape('circle')
+          }}
         />
         <ToolButton
           icon={Minus}
           label="Line"
-          onClick={() => onAddShape('line')}
+          active={tool === 'line'}
+          onClick={() => {
+            onToolChange('line')
+            onAddShape('line')
+          }}
         />
         <ToolButton
           icon={Type}
           label="Text"
-          onClick={() => onAddText()}
+          active={tool === 'text'}
+          onClick={() => onToolChange('text')}
         />
+        
+        <div className="w-px h-5 bg-white/10"></div>
+        
         <ToolButton
           icon={Wand2}
           label="Extract Text"
-          onClick={() => onShowTextExtractor()}
+          active={false}
+          onClick={onShowTextExtractor}
         />
         <ToolButton
           icon={Undo2}
           label="Undo"
-          onClick={() => onUndo()}
-          variant="secondary"
+          active={false}
+          onClick={onUndo}
         />
         <ToolButton
           icon={Trash2}
           label="Clear All"
-          onClick={() => onClear()}
-          variant="destructive"
+          active={false}
+          onClick={onClear}
         />
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-3 flex-wrap items-start sm:items-center">
+      {/* Controls - Color, Size, Opacity */}
+      <div className="flex gap-2 flex-wrap items-center bg-background/40 backdrop-blur-lg rounded-full px-4 py-2 border border-white/10 w-fit">
         {/* Color Picker */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-foreground">Color:</label>
+          <label className="text-xs font-medium text-foreground/70">Color:</label>
           <input
             type="color"
             value={color}
             onChange={(e) => onColorChange(e.target.value)}
-            className="w-12 h-10 rounded cursor-pointer border border-border"
+            className="w-8 h-8 rounded-lg cursor-pointer border border-white/20"
           />
         </div>
 
+        <div className="w-px h-4 bg-white/10"></div>
+
         {/* Size Slider */}
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <label className="text-sm font-medium text-foreground whitespace-nowrap">Size:</label>
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-medium text-foreground/70 whitespace-nowrap">Size:</label>
           <input
             type="range"
             min="1"
-            max="50"
+            max="20"
             value={size}
             onChange={(e) => onSizeChange(Number(e.target.value))}
-            className="flex-1"
+            className="w-24 h-1.5 rounded-full bg-white/20 cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(size / 20) * 100}%, rgba(255,255,255,0.2) ${(size / 20) * 100}%, rgba(255,255,255,0.2) 100%)`
+            }}
           />
-          <span className="text-sm text-muted-foreground w-8">{size}px</span>
+          <span className="text-xs text-foreground/60 w-6">{size}</span>
         </div>
 
+        <div className="w-px h-4 bg-white/10"></div>
+
         {/* Opacity Slider */}
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <label className="text-sm font-medium text-foreground whitespace-nowrap">Opacity:</label>
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-medium text-foreground/70 whitespace-nowrap">Opacity:</label>
           <input
             type="range"
             min="0"
             max="100"
             value={opacity}
             onChange={(e) => onOpacityChange(Number(e.target.value))}
-            className="flex-1"
+            className="w-24 h-1.5 rounded-full bg-white/20 cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${opacity}%, rgba(255,255,255,0.2) ${opacity}%, rgba(255,255,255,0.2) 100%)`
+            }}
           />
-          <span className="text-sm text-muted-foreground w-8">{opacity}%</span>
+          <span className="text-xs text-foreground/60 w-8">{opacity}%</span>
         </div>
       </div>
     </div>
-  )
-}
-
-interface ToolButtonProps {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  active?: boolean
-  onClick: () => void
-  variant?: 'default' | 'secondary' | 'destructive'
-}
-
-function ToolButton({ icon: Icon, label, active, onClick, variant = 'default' }: ToolButtonProps) {
-  let bgClass = 'bg-card hover:bg-muted border-border'
-  let textClass = 'text-foreground'
-
-  if (active) {
-    bgClass = 'bg-accent'
-    textClass = 'text-accent-foreground'
-  } else if (variant === 'secondary') {
-    bgClass = 'bg-muted hover:bg-muted/80 border-border'
-    textClass = 'text-foreground'
-  } else if (variant === 'destructive') {
-    bgClass = 'bg-destructive/10 hover:bg-destructive/20 border-destructive'
-    textClass = 'text-destructive'
-  }
-
-  return (
-    <button
-      onClick={onClick}
-      title={label}
-      className={`p-2 rounded border flex items-center gap-2 transition-colors ${bgClass} ${textClass}`}
-    >
-      <Icon className="w-5 h-5" />
-      <span className="text-sm hidden sm:inline">{label}</span>
-    </button>
   )
 }

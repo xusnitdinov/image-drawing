@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button'
 
 interface TextExtractorProps {
   imageUrl: string
+  isAutoRunning?: boolean
   onClose: () => void
   onHighlight: (text: string) => void
 }
 
-export default function TextExtractor({ imageUrl, onClose, onHighlight }: TextExtractorProps) {
+export default function TextExtractor({ imageUrl, isAutoRunning = false, onClose, onHighlight }: TextExtractorProps) {
   const [extractedText, setExtractedText] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
   const [selectedText, setSelectedText] = useState<string>('')
@@ -59,7 +60,10 @@ export default function TextExtractor({ imageUrl, onClose, onHighlight }: TextEx
       <div className="bg-card rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-2xl font-bold text-foreground">Extract Text from Image</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Extract Text from Image</h2>
+            {isAutoRunning && <p className="text-xs text-muted-foreground mt-1">Auto-extracting text...</p>}
+          </div>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground transition-colors"

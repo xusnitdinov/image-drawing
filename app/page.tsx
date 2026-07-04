@@ -1,12 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ImageUpload from '@/components/image-upload'
 import Canvas from '@/components/canvas'
 
 export default function Home() {
   const [images, setImages] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    // Load test image if requested
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('test') === 'true') {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0)
+          const dataUrl = canvas.toDataURL('image/png')
+          setImages([dataUrl])
+        }
+      }
+      img.src = '/test-image.png'
+    }
+  }, [])
 
   const handleImagesAdded = (newImages: string[]) => {
     setImages((prev) => [...prev, ...newImages])

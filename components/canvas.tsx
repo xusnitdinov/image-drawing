@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { ChevronLeft, ChevronRight, Home, Trash2, Loader } from 'lucide-react'
 import DrawingToolbar from './drawing-toolbar'
 import TextExtractor from './text-extractor'
 import ExportButton from './export-button'
-import NavigationControls from './navigation-controls'
 
 interface CanvasProps {
   imageUrl: string
@@ -29,13 +29,15 @@ export default function Canvas({
   onRemoveImage,
 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [tool, setTool] = useState<string>('pen')
-  const [color, setColor] = useState<string>('#000000')
-  const [size, setSize] = useState<number>(3)
+  const [color, setColor] = useState<string>('#3b82f6')
+  const [size, setSize] = useState<number>(4)
   const [opacity, setOpacity] = useState<number>(100)
-  const [isDrawing, setIsDrawing] = useState(false)
-  const [showTextExtractor, setShowTextExtractor] = useState(false)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
+  const [showTextExtractor, setShowTextExtractor] = useState(false)
+  const [isOCRRunning, setIsOCRRunning] = useState(false)
+  const [scale, setScale] = useState<number>(1)
   const historyRef = useRef<ImageData[]>([])
   const isDrawingRef = useRef(false)
   const lastPointRef = useRef<DrawPoint>({ x: 0, y: 0 })
@@ -46,27 +48,43 @@ export default function Canvas({
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       setImage(img)
+      // Auto-run OCR when image loads
+      setIsOCRRunning(true)
+      setShowTextExtractor(true)
+    }
+    img.onerror = () => {
+      console.error('[v0] Failed to load image')
     }
     img.src = imageUrl
   }, [imageUrl])
 
-  // Initialize and draw canvas
+  // Initialize and draw canvas to fill screen
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas || !image) return
+    const container = containerRef.current
+    if (!canvas || !image || !container) return
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Get container dimensions
+    const containerWidth = container.clientWidth
+    const containerHeight = container.clientHeight
+
+    // Calculate scale to fit image in container while maintaining aspect ratio
+    const scaleX = containerWidth / image.width
+    const scaleY = containerHeight / image.height
+    const calculatedScale = Math.min(scaleX, scaleY, 1) // Don't upscale
+
+    setScale(calculatedScale)
+
     // Set canvas size
-    const maxWidth = window.innerWidth - 80
-    const maxHeight = window.innerHeight - 200
-    const scale = Math.min(maxWidth / image.width, maxHeight / image.height)
+    canvas.width = image.width * calculatedScale
+    canvas.height = image.height * calculatedScale
 
-    canvas.width = image.width * scale
-    canvas.height = image.height * scale
-
-    // Draw image
+    // Draw image with high quality
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
 
     // Save initial state
@@ -217,76 +235,107 @@ export default function Canvas({
     if (!ctx) return
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
     historyRef.current = [ctx.getImageData(0, 0, canvas.width, canvas.height)]
   }
 
   return (
-    <div className="w-full h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-foreground">Photo Drawer</h1>
-          <span className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {totalImages}
-          </span>
+    <div ref={containerRef} className="w-screen h-screen bg-background overflow-hidden relative flex items-center justify-center">
+      {/* Full-screen Canvas */}
+      {image ? (
+        <canvas
+          ref={canvasRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className="cursor-crosshair max-w-full max-h-full object-contain"
+        />
+      ) : (
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading image...</p>
         </div>
-        <NavigationControls
-          onPrevious={onPrevious}
-          onNext={onNext}
-          onRemoveImage={onRemoveImage}
-          canGoPrevious={currentIndex > 0}
-          canGoNext={currentIndex < totalImages - 1}
-        />
+      )}
+
+      {/* Top Header */}
+      <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-background/80 to-transparent px-6 py-4 backdrop-blur-sm border-b border-border/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground">Photo Drawer</h1>
+            <span className="px-3 py-1 rounded-full bg-accent/20 text-accent text-sm font-medium">
+              {currentIndex + 1} / {totalImages}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.location.href = '/'}
+              className="p-2 rounded-lg hover:bg-card/50 text-muted-foreground hover:text-foreground transition-colors"
+              title="Back to upload"
+            >
+              <Home className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Main Canvas Area */}
-      <div className="flex-1 relative overflow-auto bg-muted/30 flex items-center justify-center p-4">
-        {image ? (
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              className="cursor-crosshair border border-border shadow-lg rounded-lg max-w-full max-h-full"
-            />
+      {/* Floating Toolbar at Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm border-t border-border/20 p-6">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <DrawingToolbar
+            tool={tool}
+            color={color}
+            size={size}
+            opacity={opacity}
+            onToolChange={setTool}
+            onColorChange={setColor}
+            onSizeChange={setSize}
+            onOpacityChange={setOpacity}
+            onAddShape={addShape}
+            onAddText={() => addText(50, 50)}
+            onUndo={undo}
+            onClear={clear}
+            onShowTextExtractor={() => setShowTextExtractor(true)}
+          />
+          <div className="flex items-center justify-between">
+            <button
+              onClick={onPrevious}
+              disabled={currentIndex === 0}
+              className="p-2 rounded-lg hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <ExportButton canvasRef={canvasRef} />
+            <button
+              onClick={onNext}
+              disabled={currentIndex === totalImages - 1}
+              className="p-2 rounded-lg hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            <button
+              onClick={onRemoveImage}
+              className="p-2 rounded-lg hover:bg-destructive/20 text-destructive transition-colors ml-auto"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
           </div>
-        ) : (
-          <div className="text-center">
-            <p className="text-muted-foreground">Loading image...</p>
-          </div>
-        )}
-      </div>
-
-      {/* Toolbar */}
-      <div className="bg-card border-t border-border p-4 space-y-4">
-        <DrawingToolbar
-          tool={tool}
-          color={color}
-          size={size}
-          opacity={opacity}
-          onToolChange={setTool}
-          onColorChange={setColor}
-          onSizeChange={setSize}
-          onOpacityChange={setOpacity}
-          onAddShape={addShape}
-          onAddText={() => addText(50, 50)}
-          onUndo={undo}
-          onClear={clear}
-          onShowTextExtractor={() => setShowTextExtractor(true)}
-        />
-        <ExportButton canvasRef={canvasRef} />
+        </div>
       </div>
 
       {/* Text Extractor Modal */}
       {showTextExtractor && (
         <TextExtractor
           imageUrl={imageUrl}
-          onClose={() => setShowTextExtractor(false)}
+          isAutoRunning={isOCRRunning}
+          onClose={() => {
+            setShowTextExtractor(false)
+            setIsOCRRunning(false)
+          }}
           onHighlight={(text) => {
             setShowTextExtractor(false)
+            setIsOCRRunning(false)
           }}
         />
       )}

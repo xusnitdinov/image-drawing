@@ -1,8 +1,7 @@
 'use client'
 
 import { Download } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 interface ExportButtonProps {
   canvasRef: React.RefObject<HTMLCanvasElement>
@@ -45,23 +44,22 @@ export default function ExportButton({ canvasRef }: ExportButtonProps) {
 
   return (
     <div className="flex gap-2 flex-wrap">
-      <Button
+      <button
         onClick={() => exportImage(true)}
         disabled={isExporting}
-        className="bg-accent hover:bg-accent/90 text-accent-foreground flex items-center gap-2 px-4 py-2"
+        className="flex items-center gap-2 px-6 py-2 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium transition-all disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
         {isExporting ? 'Exporting...' : 'Export with Drawings'}
-      </Button>
-      <Button
+      </button>
+      <button
         onClick={() => exportImage(false)}
         disabled={isExporting}
-        variant="outline"
-        className="flex items-center gap-2 px-4 py-2"
+        className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 hover:bg-white/20 text-foreground border border-white/20 font-medium transition-all disabled:opacity-50"
       >
         <Download className="w-4 h-4" />
         {isExporting ? 'Exporting...' : 'Export Original'}
-      </Button>
+      </button>
     </div>
   )
 }
