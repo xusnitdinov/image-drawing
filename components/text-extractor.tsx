@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { X, Loader2 } from 'lucide-react'
-import { Tesseract } from 'tesseract.js'
 import { Button } from '@/components/ui/button'
 
 interface TextExtractorProps {
@@ -24,16 +23,23 @@ export default function TextExtractor({ imageUrl, isAutoRunning = false, onClose
         setIsLoading(true)
         setError('')
 
+        // Dynamically import Tesseract to avoid SSR issues
+        const Tesseract = (await import('tesseract.js')).default
+
         const result = await Tesseract.recognize(imageUrl, 'eng', {
-          logger: (m) => {
-            console.log('[v0] OCR progress:', m)
+          logger: (m: any) => {
+            console.log('[v0] OCR progress:', m.status, Math.round(m.progress * 100) + '%')
           },
         })
 
-        setExtractedText(result.data.text)
-      } catch (err) {
-        console.error('[v0] OCR error:', err)
-        setError('Failed to extract text. Please try again.')
+        if (result && result.data && result.data.text) {
+          setExtractedText(result.data.text)
+        } else {
+          setError('No text found in the image.')
+        }
+      } catch (err: any) {
+        console.error('[v0] OCR error:', err?.message || err)
+        setError('Failed to extract text. The image quality might be too low or format unsupported.')
       } finally {
         setIsLoading(false)
       }

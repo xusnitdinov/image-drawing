@@ -167,10 +167,10 @@ export default function DrawingToolbar({
             max="50"
             value={size}
             onChange={(e) => onSizeChange(Number(e.target.value))}
-            className="w-20 h-1.5 rounded-full cursor-pointer accent-blue-500"
+            className="w-20"
             style={{
               background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(size / 50) * 100}%, rgba(255,255,255,0.2) ${(size / 50) * 100}%, rgba(255,255,255,0.2) 100%)`
-            }}
+            } as React.CSSProperties}
           />
           <span className="text-xs text-foreground/60 w-5">{size}</span>
         </div>
@@ -186,10 +186,10 @@ export default function DrawingToolbar({
             max="100"
             value={opacity}
             onChange={(e) => onOpacityChange(Number(e.target.value))}
-            className="w-20 h-1.5 rounded-full cursor-pointer accent-blue-500"
+            className="w-20"
             style={{
               background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${opacity}%, rgba(255,255,255,0.2) ${opacity}%, rgba(255,255,255,0.2) 100%)`
-            }}
+            } as React.CSSProperties}
           />
           <span className="text-xs text-foreground/60 w-5">{opacity}%</span>
         </div>

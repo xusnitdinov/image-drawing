@@ -160,4 +160,36 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Custom Range Input Styling */
+  input[type='range'] {
+    @apply appearance-none w-full h-2 rounded-full cursor-pointer accent-blue-500;
+    background: linear-gradient(to right, #3b82f6 0%, #3b82f6 var(--value), rgba(255, 255, 255, 0.2) var(--value), rgba(255, 255, 255, 0.2) 100%);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 rounded-full bg-accent shadow-lg cursor-pointer border-2 border-accent-foreground/20;
+    transition: all 0.2s ease;
+  }
+
+  input[type='range']::-webkit-slider-thumb:hover {
+    @apply scale-110 shadow-xl;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    @apply w-4 h-4 rounded-full bg-accent shadow-lg cursor-pointer border-2 border-accent-foreground/20;
+    transition: all 0.2s ease;
+  }
+
+  input[type='range']::-moz-range-thumb:hover {
+    @apply scale-110 shadow-xl;
+  }
+
+  input[type='range']::-moz-range-track {
+    @apply bg-transparent border-0;
+  }
+
+  input[type='range']::-moz-range-progress {
+    @apply bg-accent rounded-full;
+  }
 }

@@ -240,25 +240,27 @@ export default function Canvas({
   }
 
   return (
-    <div ref={containerRef} className="w-screen h-screen bg-background overflow-hidden relative flex items-center justify-center">
-      {/* Full-screen Canvas */}
-      {image ? (
-        <canvas
-          ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          className="cursor-crosshair max-w-full max-h-full object-contain"
-        />
-      ) : (
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading image...</p>
-        </div>
-      )}
+    <div ref={containerRef} className="w-screen h-screen bg-background overflow-auto relative">
+      <div className="inline-flex items-center justify-center min-h-full min-w-full" style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2" fill="%233b82f6" opacity="0.8"/></svg>') 6 6, auto` }}>
+        {/* Full-screen Canvas */}
+        {image ? (
+          <canvas
+            ref={canvasRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            className="shadow-lg rounded-lg"
+          />
+        ) : (
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading image...</p>
+          </div>
+        )}
+      </div>
 
       {/* Top Header */}
-      <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-background/80 to-transparent px-6 py-4 backdrop-blur-sm border-b border-border/20">
+      <div className="fixed top-0 left-0 right-0 bg-gradient-to-b from-background/95 via-background/80 to-transparent px-6 py-3 backdrop-blur-sm border-b border-border/20 z-40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-foreground">Photo Drawer</h1>
@@ -279,7 +281,7 @@ export default function Canvas({
       </div>
 
       {/* Floating Toolbar at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm border-t border-border/20 px-3 py-2">
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background/98 via-background/95 to-transparent backdrop-blur-sm border-t border-border/20 px-3 py-2 z-40">
         <div className="max-w-7xl mx-auto space-y-1.5">
           <DrawingToolbar
             tool={tool}
