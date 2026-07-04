@@ -132,6 +132,23 @@ export default function Canvas({
     }
   }
 
+  const interpolatePoints = (x1: number, y1: number, x2: number, y2: number, distance: number = 5) => {
+    const points: Array<{ x: number; y: number }> = []
+    const dx = x2 - x1
+    const dy = y2 - y1
+    const totalDistance = Math.sqrt(dx * dx + dy * dy)
+    const steps = Math.ceil(totalDistance / distance)
+
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps
+      points.push({
+        x: x1 + dx * t,
+        y: y1 + dy * t,
+      })
+    }
+    return points
+  }
+
   const drawSmoothLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => {
     ctx.strokeStyle = color
     ctx.lineWidth = size
@@ -155,10 +172,17 @@ export default function Canvas({
       ctx.globalCompositeOperation = 'source-over'
     }
 
-    // Use quadratic curve for smooth drawing instead of straight line
+    // Interpolate points to fill gaps when mouse moves fast
+    const points = interpolatePoints(x1, y1, x2, y2, 2)
+
+    // Draw continuous line through interpolated points
     ctx.beginPath()
-    ctx.moveTo(x1, y1)
-    ctx.quadraticCurveTo(x1, y1, (x1 + x2) / 2, (y1 + y2) / 2)
+    ctx.moveTo(points[0].x, points[0].y)
+
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y)
+    }
+
     ctx.stroke()
 
     ctx.globalCompositeOperation = 'source-over'
