@@ -1,33 +1,39 @@
-# image-drawing-tool
+# 📸 Photo Drawer
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+**Upload images and draw/annotate like a pro.**  
+Simple, fast, and smooth image annotation tool.
 
-## Built with v0
+## Screenshots
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+![Main Screen](https://github.com/user-attachments/assets/e3451a26-bdad-4372-92a0-433fa2190905)
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_cZuvh9jpLfWzFandbH8gVwgzhIPR)
+![Drawing in action](https://github.com/user-attachments/assets/a3393802-f737-4561-85bf-f174b5b76ac4)
 
-## Getting Started
+## ✨ Features
 
-First, run the development server:
+- Drag & drop or click to upload images
+- Professional drawing tools (brush, shapes, text, etc.)
+- Color picker & adjustable brush size
+- Undo / Redo
+- Export your annotated image (PNG)
+- Supports **PNG, JPG, WebP**
 
-```bash
+## 🚀 Live Demo
+
+[Try it now](https://image-drawing-tool.vercel.app/)
+
+## 🛠 Tech Stack
+
+- Built with **v0** + Next.js
+- Deployed on **Vercel**
+
+## How to Run Locally
+
+bash
+git clone https://github.com/yourusername/image-drawing-tool.git
+cd image-drawing-tool
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+## License
+MIT
