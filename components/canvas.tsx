@@ -48,9 +48,7 @@ export default function Canvas({
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       setImage(img)
-      // Auto-run OCR when image loads
-      setIsOCRRunning(true)
-      setShowTextExtractor(true)
+      // Don't auto-run OCR - let user trigger it manually
     }
     img.onerror = () => {
       console.error('[v0] Failed to load image')
@@ -74,7 +72,7 @@ export default function Canvas({
     // Calculate scale to fit image in container while maintaining aspect ratio
     const scaleX = containerWidth / image.width
     const scaleY = containerHeight / image.height
-    const calculatedScale = Math.min(scaleX, scaleY, 1) // Don't upscale
+    const calculatedScale = Math.min(scaleX, scaleY) // Allow slight upscaling if needed
 
     setScale(calculatedScale)
 
@@ -281,8 +279,8 @@ export default function Canvas({
       </div>
 
       {/* Floating Toolbar at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm border-t border-border/20 p-6">
-        <div className="max-w-7xl mx-auto space-y-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm border-t border-border/20 px-3 py-2">
+        <div className="max-w-7xl mx-auto space-y-1.5">
           <DrawingToolbar
             tool={tool}
             color={color}
@@ -298,27 +296,30 @@ export default function Canvas({
             onClear={clear}
             onShowTextExtractor={() => setShowTextExtractor(true)}
           />
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-1.5">
             <button
               onClick={onPrevious}
               disabled={currentIndex === 0}
-              className="p-2 rounded-lg hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+              className="p-1 rounded-md hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+              title="Previous"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <ExportButton canvasRef={canvasRef} />
             <button
               onClick={onNext}
               disabled={currentIndex === totalImages - 1}
-              className="p-2 rounded-lg hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+              className="p-1 rounded-md hover:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed text-foreground transition-colors"
+              title="Next"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-4 h-4" />
             </button>
             <button
               onClick={onRemoveImage}
-              className="p-2 rounded-lg hover:bg-destructive/20 text-destructive transition-colors ml-auto"
+              className="p-1 rounded-md hover:bg-destructive/20 text-destructive transition-colors ml-auto"
+              title="Delete"
             >
-              <Trash2 className="w-5 h-5" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>

@@ -43,22 +43,22 @@ export default function ExportButton({ canvasRef }: ExportButtonProps) {
   }
 
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-1.5 flex-wrap">
       <button
         onClick={() => exportImage(true)}
         disabled={isExporting}
-        className="flex items-center gap-2 px-6 py-2 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium transition-all disabled:opacity-50"
+        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-sm transition-all disabled:opacity-50"
       >
-        <Download className="w-4 h-4" />
-        {isExporting ? 'Exporting...' : 'Export with Drawings'}
+        <Download className="w-3.5 h-3.5" />
+        {isExporting ? 'Exporting...' : 'With Drawings'}
       </button>
       <button
         onClick={() => exportImage(false)}
         disabled={isExporting}
-        className="flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 hover:bg-white/20 text-foreground border border-white/20 font-medium transition-all disabled:opacity-50"
+        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-foreground border border-white/20 font-medium text-sm transition-all disabled:opacity-50"
       >
-        <Download className="w-4 h-4" />
-        {isExporting ? 'Exporting...' : 'Export Original'}
+        <Download className="w-3.5 h-3.5" />
+        {isExporting ? 'Exporting...' : 'Original'}
       </button>
     </div>
   )

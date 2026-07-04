@@ -14,13 +14,13 @@ function ToolButton({ icon: Icon, label, active, onClick }: ToolButtonProps) {
     <button
       onClick={onClick}
       title={label}
-      className={`p-2 rounded-lg transition-all ${
+      className={`p-1.5 rounded-md transition-all ${
         active
           ? 'bg-accent text-accent-foreground shadow-lg'
           : 'text-foreground hover:bg-white/10'
       }`}
     >
-      <Icon className="w-5 h-5" />
+      <Icon className="w-4 h-4" />
     </button>
   )
 }
@@ -57,9 +57,9 @@ export default function DrawingToolbar({
   onShowTextExtractor,
 }: DrawingToolbarProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {/* Main Tool Icons - Floating Pill */}
-      <div className="flex gap-2 items-center bg-background/40 backdrop-blur-lg rounded-full px-3 py-2 border border-white/10 w-fit">
+      <div className="flex gap-1 items-center bg-background/40 backdrop-blur-lg rounded-full px-2 py-1.5 border border-white/10 w-fit">
         <ToolButton
           icon={Pen}
           label="Pen"
@@ -144,54 +144,54 @@ export default function DrawingToolbar({
       </div>
 
       {/* Controls - Color, Size, Opacity */}
-      <div className="flex gap-2 flex-wrap items-center bg-background/40 backdrop-blur-lg rounded-full px-4 py-2 border border-white/10 w-fit">
+      <div className="flex gap-1.5 flex-wrap items-center bg-background/40 backdrop-blur-lg rounded-full px-3 py-1.5 border border-white/10 w-fit">
         {/* Color Picker */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <label className="text-xs font-medium text-foreground/70">Color:</label>
           <input
             type="color"
             value={color}
             onChange={(e) => onColorChange(e.target.value)}
-            className="w-8 h-8 rounded-lg cursor-pointer border border-white/20"
+            className="w-6 h-6 rounded-md cursor-pointer border border-white/20"
           />
         </div>
 
-        <div className="w-px h-4 bg-white/10"></div>
+        <div className="w-px h-3 bg-white/10"></div>
 
         {/* Size Slider */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-foreground/70 whitespace-nowrap">Size:</label>
+        <div className="flex items-center gap-1.5">
+          <label className="text-xs font-medium text-foreground/70">Size:</label>
           <input
             type="range"
             min="1"
-            max="20"
+            max="50"
             value={size}
             onChange={(e) => onSizeChange(Number(e.target.value))}
-            className="w-24 h-1.5 rounded-full bg-white/20 cursor-pointer"
+            className="w-20 h-1.5 rounded-full cursor-pointer accent-blue-500"
             style={{
-              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(size / 20) * 100}%, rgba(255,255,255,0.2) ${(size / 20) * 100}%, rgba(255,255,255,0.2) 100%)`
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(size / 50) * 100}%, rgba(255,255,255,0.2) ${(size / 50) * 100}%, rgba(255,255,255,0.2) 100%)`
             }}
           />
-          <span className="text-xs text-foreground/60 w-6">{size}</span>
+          <span className="text-xs text-foreground/60 w-5">{size}</span>
         </div>
 
-        <div className="w-px h-4 bg-white/10"></div>
+        <div className="w-px h-3 bg-white/10"></div>
 
         {/* Opacity Slider */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-foreground/70 whitespace-nowrap">Opacity:</label>
+        <div className="flex items-center gap-1.5">
+          <label className="text-xs font-medium text-foreground/70">Opacity:</label>
           <input
             type="range"
             min="0"
             max="100"
             value={opacity}
             onChange={(e) => onOpacityChange(Number(e.target.value))}
-            className="w-24 h-1.5 rounded-full bg-white/20 cursor-pointer"
+            className="w-20 h-1.5 rounded-full cursor-pointer accent-blue-500"
             style={{
               background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${opacity}%, rgba(255,255,255,0.2) ${opacity}%, rgba(255,255,255,0.2) 100%)`
             }}
           />
-          <span className="text-xs text-foreground/60 w-8">{opacity}%</span>
+          <span className="text-xs text-foreground/60 w-5">{opacity}%</span>
         </div>
       </div>
     </div>
