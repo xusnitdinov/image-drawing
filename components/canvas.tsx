@@ -69,10 +69,10 @@ export default function Canvas({
     const containerWidth = container.clientWidth
     const containerHeight = container.clientHeight
 
-    // Calculate scale to fit image in container while maintaining aspect ratio
+    // Calculate scale - make image wider by scaling up more
     const scaleX = containerWidth / image.width
     const scaleY = containerHeight / image.height
-    const calculatedScale = Math.min(scaleX, scaleY) // Allow slight upscaling if needed
+    const calculatedScale = Math.max(scaleX, scaleY * 0.95) // Scale to fill width with slight margin
 
     setScale(calculatedScale)
 
@@ -116,7 +116,7 @@ export default function Canvas({
     const y = e.clientY - rect.top
 
     if (tool === 'pen' || tool === 'highlighter' || tool === 'marker') {
-      drawLine(ctx, lastPointRef.current.x, lastPointRef.current.y, x, y)
+      drawSmoothLine(ctx, lastPointRef.current.x, lastPointRef.current.y, x, y)
     }
 
     lastPointRef.current = { x, y }
@@ -132,14 +132,49 @@ export default function Canvas({
     }
   }
 
+  const drawSmoothLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => {
+    ctx.strokeStyle = color
+    ctx.lineWidth = size
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.globalAlpha = opacity / 100
+
+    if (tool === 'pen') {
+      ctx.globalCompositeOperation = 'source-over'
+    } else if (tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.lineWidth = size * 2
+    } else if (tool === 'highlighter') {
+      ctx.globalCompositeOperation = 'multiply'
+      ctx.lineWidth = size * 3
+      ctx.globalAlpha = 0.3
+    } else if (tool === 'marker') {
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.lineWidth = size * 2
+    } else {
+      ctx.globalCompositeOperation = 'source-over'
+    }
+
+    // Use quadratic curve for smooth drawing instead of straight line
+    ctx.beginPath()
+    ctx.moveTo(x1, y1)
+    ctx.quadraticCurveTo(x1, y1, (x1 + x2) / 2, (y1 + y2) / 2)
+    ctx.stroke()
+
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.globalAlpha = 1
+  }
+
   const drawLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) => {
     ctx.strokeStyle = color
     ctx.lineWidth = size
-    ctx.globalAlpha = opacity / 100
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
+    ctx.globalAlpha = opacity / 100
 
-    if (tool === 'eraser') {
+    if (tool === 'pen') {
+      ctx.globalCompositeOperation = 'source-over'
+    } else if (tool === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out'
       ctx.lineWidth = size * 2
     } else if (tool === 'highlighter') {
@@ -241,7 +276,7 @@ export default function Canvas({
 
   return (
     <div ref={containerRef} className="w-screen h-screen bg-background overflow-auto relative">
-      <div className="inline-flex items-center justify-center min-h-full min-w-full" style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="2" fill="%233b82f6" opacity="0.8"/></svg>') 6 6, auto` }}>
+      <div className="inline-flex items-center justify-center min-h-full min-w-full" style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="%233b82f6"/><circle cx="12" cy="12" r="8" fill="none" stroke="%233b82f6" stroke-width="1.5" opacity="0.4"/></svg>') 12 12, auto` }}>
         {/* Full-screen Canvas */}
         {image ? (
           <canvas
