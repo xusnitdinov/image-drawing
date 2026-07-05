@@ -34,6 +34,7 @@ git clone https://github.com/yourusername/image-drawing-tool.git
 cd image-drawing-tool
 npm install
 npm run dev
+```
 
 ## License
 MIT
