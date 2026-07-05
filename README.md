@@ -38,6 +38,6 @@ npm run dev
 
 ## License
 
-#MIT
+# MIT
 
 Made with 💖 by Xusnitdinov Azizbek
