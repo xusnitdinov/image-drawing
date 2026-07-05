@@ -29,7 +29,7 @@ Simple, fast, and smooth image annotation tool.
 
 ## How to Run Locally
 
-bash
+```bash
 git clone https://github.com/yourusername/image-drawing-tool.git
 cd image-drawing-tool
 npm install
