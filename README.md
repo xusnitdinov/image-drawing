@@ -20,7 +20,7 @@ Simple, fast, and smooth image annotation tool.
 
 ## 🚀 Live Demo
 
-[Try it now]((https://photo-drawer.vercel.app/))
+[Try it now](https://photo-drawer.vercel.app/)
 
 ## 🛠 Tech Stack
 
